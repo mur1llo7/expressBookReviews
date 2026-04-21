@@ -63,61 +63,43 @@ public_users.get('/review/:isbn',function (req, res) {
   res.send(books[isbn].reviews);
 });
 
+// Get all books
+public_users.get('/async/books', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:5000/');
+    res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get the books by ISBN using async/await
 public_users.get('/async/isbn/:isbn', async (req, res) => {
   try {
-    const isbn = req.params.isbn;
-    const book = await new Promise((resolve, reject) => {
-      if (books[isbn]) {
-        resolve(books[isbn]);
-      } else {
-        reject(new Error("Book not found"));
-      }
-    });
-    res.status(200).json(book);
+    const response = await axios.get(`http://localhost:5000/isbn/${req.params.isbn}`);
+    res.status(200).json(response.data);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 // Get the books by Author using async/await
-public_users.get('/async/author/:author', async (req, res) =>  {
+public_users.get('/async/author/:author', async (req, res) => {
   try {
-    const author = decodeURIComponent(req.params.author);
-    const matchingBooks = await new Promise ((resolve, reject) => {
-      const result = Object.keys(books)
-      .filter(key => books[key].author === author)
-      .map(key => books[key]);
-
-      if(result.length > 0) {
-        resolve(result);
-      } else {
-        reject(new Error("No books found for this author"));
-      }
-    });
-    res.status(200).json(matchingBooks);
+    const response = await axios.get(`http://localhost:5000/author/${req.params.author}`);
+    res.status(200).json(response.data);
   } catch (error) {
-    res.status(404).json({ message:error.message })
+    res.status(500).json({ message: error.message });
   }
-})
+});
 
 // Get the book by title using async/await
 public_users.get('/async/title/:title', async (req, res) => {
   try {
-    const title = decodeURIComponent(req.params.title);
-    const matchingBooks = await new Promise((resolve, reject) => {
-      const result = Object.keys(books)
-        .filter(key => books[key].title === title)
-        .map(key => books[key]);
-      if (result.length > 0) {
-        resolve(result);
-      } else {
-        reject(new Error("No books found for this title"));
-      }
-    });
-    res.status(200).json(matchingBooks);
+    const response = await axios.get(`http://localhost:5000/title/${req.params.title}`);
+    res.status(200).json(response.data);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

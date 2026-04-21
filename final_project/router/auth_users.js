@@ -45,7 +45,7 @@ regd_users.post("/login", (req,res) => {
   let accessToken = jwt.sign({ username }, "access", { expiresIn: "1h" });
   req.session.authorization = { accessToken, username };
 
-  res.status(200).json({ message:"User logged in succesfully" })
+  res.status(200).json({ message:"Customer logged in succesfully" })
 
 });
 
@@ -78,7 +78,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
 
   // Check the user actually has a review to delete
   if (!books[isbn].reviews[username]) {
-    return res.status(404).json({ message:"No review found for this user" });
+    return res.status(404).json({ message:"No review found for this Customer" });
   }
 
   // Delete only this user's review
