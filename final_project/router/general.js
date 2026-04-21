@@ -4,6 +4,7 @@ const send = require('send');
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
 
 
 public_users.post("/register", (req,res) => {
@@ -60,6 +61,64 @@ public_users.get('/title/:title',function (req, res) {
 public_users.get('/review/:isbn',function (req, res) {
   const isbn = req.params.isbn;
   res.send(books[isbn].reviews);
+});
+
+// Get the books by ISBN using async/await
+public_users.get('/async/isbn/:isbn', async (req, res) => {
+  try {
+    const isbn = req.params.isbn;
+    const book = await new Promise((resolve, reject) => {
+      if (books[isbn]) {
+        resolve(books[isbn]);
+      } else {
+        reject(new Error("Book not found"));
+      }
+    });
+    res.status(200).json(book);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+// Get the books by Author using async/await
+public_users.get('/async/author/:author', async (req, res) =>  {
+  try {
+    const author = decodeURIComponent(req.params.author);
+    const matchingBooks = await new Promise ((resolve, reject) => {
+      const result = Object.keys(books)
+      .filter(key => books[key].author === author)
+      .map(key => books[key]);
+
+      if(result.length > 0) {
+        resolve(result);
+      } else {
+        reject(new Error("No books found for this author"));
+      }
+    });
+    res.status(200).json(matchingBooks);
+  } catch (error) {
+    res.status(404).json({ message:error.message })
+  }
+})
+
+// Get the book by title using async/await
+public_users.get('/async/title/:title', async (req, res) => {
+  try {
+    const title = decodeURIComponent(req.params.title);
+    const matchingBooks = await new Promise((resolve, reject) => {
+      const result = Object.keys(books)
+        .filter(key => books[key].title === title)
+        .map(key => books[key]);
+      if (result.length > 0) {
+        resolve(result);
+      } else {
+        reject(new Error("No books found for this title"));
+      }
+    });
+    res.status(200).json(matchingBooks);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
 });
 
 module.exports.general = public_users;
