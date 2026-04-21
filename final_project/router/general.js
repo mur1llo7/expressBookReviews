@@ -16,7 +16,7 @@ public_users.post("/register", (req,res) => {
 
   const userExist = users.some(user => user.username === username);
   if (userExist) {
-    return res.status(409).json ({ messag: "Username already exist" })
+    return res.status(409).json ({ message: "Username already exist" })
   }
 
   users.push ({ username, password });
@@ -74,13 +74,14 @@ public_users.get('/async/books', async (req, res) => {
 });
 
 // Get the books by ISBN using async/await
-public_users.get('/async/isbn/:isbn', async (req, res) => {
-  try {
-    const response = await axios.get(`http://localhost:5000/isbn/${req.params.isbn}`);
-    res.status(200).json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+public_users.get('/promise/isbn/:isbn', (req, res) => {
+  axios.get(`http://localhost:5000/isbn/${req.params.isbn}`)
+    .then(response => {
+      res.status(200).json(response.data);
+    })
+    .catch(error => {
+      res.status(500).json({ message: error.message });
+    });
 });
 
 // Get the books by Author using async/await
